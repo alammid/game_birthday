@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TERMINAL CLASSIFIÉ</title>
+
+<style>
+
+body{
+    background:black;
+    color:#00ff88;
+    font-family:monospace;
+    text-align:center;
+    padding:30px;
+}
+
+.glitch{
+    font-size:32px;
+    text-shadow:0 0 10px #00ff88;
+    margin-bottom:10px;
+}
+
+.box{
+    border:1px solid #00ff88;
+    box-shadow:0 0 20px #00ff88;
+    padding:25px;
+    max-width:850px;
+    margin:auto;
+    min-height:500px;
+}
+
+button{
+    background:black;
+    color:#00ff88;
+    border:1px solid #00ff88;
+    padding:10px 15px;
+    margin:10px;
+    cursor:pointer;
+    font-family:monospace;
+    transition:0.2s;
+}
+
+button:hover{
+    background:#00ff88;
+    color:black;
+}
+
+input{
+    background:black;
+    color:#00ff88;
+    border:1px solid #00ff88;
+    padding:10px;
+    width:70%;
+    text-align:center;
+    font-family:monospace;
+    margin-top:10px;
+}
+
+#message{
+    margin-top:20px;
+    white-space:pre-line;
+    min-height:50px;
+}
+
+.question{
+    margin-top:20px;
+    font-size:20px;
+    line-height:1.6;
+}
+
+.score{
+    position:fixed;
+    top:10px;
+    right:20px;
+    color:#00ff88;
+    border:1px solid #00ff88;
+    padding:10px;
+}
+
+h1,h2,h3{
+    text-shadow:0 0 5px #00ff88;
+}
+
+ul{
+    text-align:left;
+    display:inline-block;
+}
+
+#adminPanel{
+    position:fixed;
+    bottom:10px;
+    left:10px;
+    border:1px solid red;
+    padding:10px;
+    background:black;
+    color:red;
+    font-size:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="score">
+POINTS : <span id="points">0</span>
+</div>
+
+<div id="adminBanner" style="display:none;">
+    🟥 ADMIN CONNECTÉ
+</div>
+
+<div class="glitch">🕵️ TERMINAL CLASSIFIÉ</div>
+
+<p>/// PROCÉDURE D'ÉVALUATION ACTIVE ///</p>
+
+<div class="box">
+
+    <div id="content"></div>
+
+    <div id="message"></div>
+
+</div>
+
+<div id="adminPanel">
+
+🧪 MODE TEST ACTIF
+
+<br><br>
+
+<button onclick="avanceTemps(1)">
++1h
+</button>
+
+<button onclick="avanceTemps(24)">
++1 jour
+</button>
+
+<button onclick="resetProgression()">
+RESET
+</button>
+
+</div>
+
+<script>
+
+//////////////////////////////////////////////////////
+// 🧪 MODE / PROFIL
+//////////////////////////////////////////////////////
+const urlParams = new URLSearchParams(window.location.search);
+const MODE_ADMIN = urlParams.get("mode") === "admin";
+
+const MODE_TEST = MODE_ADMIN;
+
+let simulatedDate = new Date("2026-05-12T10:31:00");
+
+// attendre que le HTML soit prêt
+window.addEventListener("DOMContentLoaded", () => {
+
+    if (!MODE_ADMIN) {
+        document.getElementById("adminPanel").style.display = "none";
+    }
+
+    if (MODE_ADMIN) {
+        document.getElementById("adminBanner").style.display = "block";
+    }
+
+});
+
+//////////////////////////////////////////////////////
+// 💾 SAUVEGARDE
+//////////////////////////////////////////////////////
+
+let points =
+parseInt(localStorage.getItem("points")) || 0;
+
+document.getElementById("points").innerText =
+points;
+
+let progression =
+parseInt(localStorage.getItem("progression")) || 0;
+
+let observationValidee =
+localStorage.getItem("observation") || "non";
+
+let indiceUtilise =
+localStorage.getItem("indiceUtilise") || "non";
+
+//////////////////////////////////////////////////////
+// 📅 ÉTAPES
+//////////////////////////////////////////////////////
+
+const etapes = [
+
+{
+date: new Date("2026-05-12T10:30:00"),
+type:"enigme"
+},
+
+{
+date: new Date("2026-05-12T10:35:00"),
+type:"bowling"
+},
+
+{
+date: new Date("2026-05-12T20:00:00"),
+type:"temps"
+},
+
+{
+date: new Date("2026-05-13T16:00:00"),
+type:"questionnaire"
+},
+
+{
+date: new Date("2026-05-14T20:00:00"),
+type:"repos"
+},
+
+{
+date: new Date("2026-05-16T20:00:00"),
+type:"spectacle"
+},
+
+{
+date: new Date("2026-05-17T16:00:00"),
+type:"vol"
+},
+
+{
+date: new Date("2026-05-17T18:00:00"),
+type:"final"
+}
+
+];
+
+//////////////////////////////////////////////////////
+// 💾 SAVE
+//////////////////////////////////////////////////////
+
+function save(){
+
+    localStorage.setItem("progression", progression);
+
+    localStorage.setItem("points", points);
+
+    document.getElementById("points").innerText =
+    points;
+}
+
+//////////////////////////////////////////////////////
+// 🔒 ÉCRAN VERROUILLAGE
+//////////////////////////////////////////////////////
+
+function lockedScreen(date){
+
+    let now;
+
+    if(MODE_TEST){
+        now = simulatedDate;
+    }else{
+        now = new Date();
+    }
+
+    if(now < date){
+
+        let diff = date - now;
+
+        let jours =
+        Math.floor(diff / (1000 * 60 * 60 * 24));
+
+        let heures =
+        Math.floor((diff / (1000 * 60 * 60)) % 24);
+
+        let minutes =
+        Math.floor((diff / (1000 * 60)) % 60);
+
+        let secondes =
+        Math.floor((diff / 1000) % 60);
+
+        document.getElementById("content").innerHTML = `
+
+        <h2>⛔ ACCÈS VERROUILLÉ</h2>
+
+        <p>
+        La prochaine instruction
+        n'est pas encore disponible.
+        </p>
+
+        <h3>
+        ⏳ PROCHAINE INSTRUCTION DANS :
+        </h3>
+
+        <h1>
+        ${jours}j ${heures}h ${minutes}m ${secondes}s
+        </h1>
+
+        <p>
+        Temps simulé :
+        <br>
+        ${now.toLocaleString()}
+        </p>
+
+        `;
+
+        setTimeout(afficher,1000);
+
+        return true;
+    }
+
+    return false;
+}
+
+//////////////////////////////////////////////////////
+// 🚀 AFFICHAGE
+//////////////////////////////////////////////////////
+
+function afficher(){
+
+    document.getElementById("message").innerText = "";
+
+    let etape = etapes[progression];
+
+    if(lockedScreen(etape.date)) return;
+
+    if(etape.type === "enigme") afficherEnigme();
+
+    if(etape.type === "bowling") afficherBowling();
+
+    if(etape.type === "temps") afficherTemps();
+
+    if(etape.type === "questionnaire")
+    afficherQuestionnaire();
+
+    if(etape.type === "repos")
+    afficherRepos();
+
+    if(etape.type === "spectacle")
+    afficherSpectacle();
+
+    if(etape.type === "vol")
+    afficherVol();
+
+    if(etape.type === "final")
+    afficherFinal();
+}
+
+//////////////////////////////////////////////////////
+// 🧠 ÉNIGME OBSERVATION
+//////////////////////////////////////////////////////
+
+function afficherEnigme(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>🧠 TEST D'OBSERVATION</h2>
+
+<div class="question">
+
+Pour trouver votre première épreuve,
+observez attentivement votre environnement
+de cette matinée.
+
+</div>
+
+<input id="rep">
+
+<br>
+
+<button onclick="validerEnigme()">
+VALIDER
+</button>
+
+<button onclick="indice()">
+INDICE 💡
+</button>
+
+`;
+
+}
+
+function indice(){
+
+indiceUtilise = "oui";
+
+localStorage.setItem("indiceUtilise","oui");
+
+document.getElementById("message").innerText =
+"Comment aurais-tu fait sans indice ? 📷";
+
+}
+
+function validerEnigme(){
+
+let rep =
+document.getElementById("rep")
+.value.toLowerCase();
+
+if(rep === "bowling"){
+
+    if(indiceUtilise !== "oui"){
+
+        document.getElementById("message").innerText =
+        "Sens de l'observation validé.";
+
+        points += 20;
+
+        observationValidee = "oui";
+
+        localStorage.setItem("observation","oui");
+
+        localStorage.setItem("indiceUtilise","non");
+
+    }else{
+
+        document.getElementById("message").innerText =
+        "Observation assistée détectée.";
+
+        points += 10;
+    }
+
+    progression++;
+
+    save();
+
+    setTimeout(afficher,2000);
+
+}else{
+
+    document.getElementById("message").innerText =
+    "Accès refusé.";
+
+}
+
+}
+
+//////////////////////////////////////////////////////
+// 🎳 BOWLING
+//////////////////////////////////////////////////////
+
+function afficherBowling(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>🎳 ÉPREUVE : PRÉCISION</h2>
+
+<p>
+Entrez votre score total :
+</p>
+
+<input id="scoreBowling" type="number">
+
+<br>
+
+<button onclick="validerBowling()">
+VALIDER SCORE
+</button>
+
+`;
+
+}
+
+function validerBowling(){
+
+let score = parseInt(document.getElementById("scoreBowling").value);
+
+let message = "";
+
+if(score < 40){
+
+    document.getElementById("content").innerHTML = `
+
+    <h2>❌ ÉCHEC DE L'ÉPREUVE</h2>
+
+    <p>
+    Performance insuffisante.
+    Vous devez repasser l’épreuve.
+    </p>
+
+    <p>
+    Code de rattrapage requis :
+    </p>
+
+    <input id="mdp">
+
+    <br>
+
+    <button onclick="motMagique()">
+    VALIDER
+    </button>
+
+    `;
+
+    document.getElementById("message").innerText =
+    "Accès en rattrapage activé.";
+
+    return;
+}
+
+if(score < 60){
+
+    message = `
+🔴 FAIBLE
+
+Quelques réussites mais trop d’irrégularité.
+
+➤ Statut : EN FORTE PROGRESSION
+`;
+
+    points += 5;
+
+}else if(score < 90){
+
+    message = `
+🟠 MOYEN
+
+Résultat correct mais instable.
+
+➤ Statut : AGENT EN APPRENTISSAGE
+`;
+
+    points += 15;
+
+}else if(score < 120){
+
+    message = `
+🟡 BON
+
+Bonne maîtrise générale du jeu.
+
+➤ Statut : AGENT COMPÉTENT
+`;
+
+    points += 30;
+
+}else{
+
+    message = `
+🟢 TRÈS BON
+
+Excellente performance.
+
+➤ Statut : AGENT PROMETTEUR
+`;
+
+    points += 40;
+}
+
+document.getElementById("message").innerText = message;
+
+progression++;
+
+save();
+
+setTimeout(() => {
+    afficher();
+}, 4000);
+
+}
+function motMagique(){
+
+let mdp =
+document.getElementById("mdp").value;
+
+if(mdp === "J'aime Midu !"){
+
+    points += 15;
+
+    document.getElementById("message").innerText =
+    "Dérogation acceptée.";
+
+    progression++;
+
+    save();
+
+    setTimeout(afficher,2000);
+
+}else{
+
+    document.getElementById("message").innerText =
+    "Refus.";
+
+}
+
+}
+
+//////////////////////////////////////////////////////
+// ⏳ TEMPS
+//////////////////////////////////////////////////////
+
+function afficherTemps(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>⏳ MAÎTRISE DU TEMPS</h2>
+
+<p>
+Prochain test :
+votre maîtrise du temps.
+</p>
+
+<p>
+RDV à Arcueil ligne 14 à 13h30.
+Soyez à l'heure.
+</p>
+
+<p>
+À quelle étape êtes-vous arrivé ? (1 à 7)
+</p>
+
+<input id="tempsScore" type="number">
+
+<br>
+
+<button onclick="validerTemps()">
+VALIDER
+</button>
+
+`;
+
+}
+
+function validerTemps(){
+
+let rep = parseInt(document.getElementById("tempsScore").value);
+
+let message = "";
+
+if(rep >= 5){
+
+    message = "Maîtrise du temps exceptionnelle. Vous avez parfaitement géré votre progression.";
+    points += 30;
+
+}else if(rep >= 3){
+
+    message = "Bonne maîtrise du temps. Vous êtes dans le rythme attendu.";
+    points += 20;
+
+}else{
+
+    message = "Progression rapide mais désorganisée. Attention à la gestion du timing.";
+    points += 10;
+}
+
+document.getElementById("message").innerText = message;
+
+progression++;
+save();
+
+setTimeout(() => {
+    afficher();
+}, 3000);
+
+}
+
+//////////////////////////////////////////////////////
+// 🏕️ QUESTIONNAIRE
+//////////////////////////////////////////////////////
+let choixFinal = "";
+
+/*
+function afficherQuestionnaire(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>🏕️ ANALYSE PHYSIQUE</h2>
+
+<p>
+Pour votre prochaine épreuve,
+confrontez votre corps à l'épreuve
+qui lui convient aujourd'hui.
+</p>
+
+<p>Court ou Long ?</p>
+<input id="q1">
+
+<p>Calme ou Sensation ?</p>
+<input id="q2">
+
+<p>Basse altitude ou Haute altitude ?</p>
+<input id="q3">
+
+<br>
+
+<button onclick="validerQuestionnaire()">
+ANALYSER
+</button>
+
+`;
+
+}
+*/
+
+function afficherQuestionnaire(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>🏕️ ANALYSE PHYSIQUE</h2>
+
+<p id="qText">
+Court ou Long ?
+</p>
+
+<div id="choices">
+
+<button onclick="choixQ1('court')">Court</button>
+<button onclick="choixQ1('long')">Long</button>
+
+</div>
+
+`;
+
+}
+
+let reponsesQuestionnaire = {};
+
+function choixQ1(val){
+
+reponsesQuestionnaire.q1 = val;
+
+document.getElementById("qText").innerText =
+"Calme ou Sensation ?";
+
+document.getElementById("choices").innerHTML = `
+
+<button onclick="choixQ2('calme')">Calme</button>
+<button onclick="choixQ2('sensation')">Sensation</button>
+
+`;
+
+}
+
+function choixQ2(val){
+
+reponsesQuestionnaire.q2 = val;
+
+document.getElementById("qText").innerText =
+"Basse altitude ou Haute altitude ?";
+
+document.getElementById("choices").innerHTML = `
+
+<button onclick="choixQ3('basse')">Basse altitude</button>
+<button onclick="choixQ3('haute')">Haute altitude</button>
+
+`;
+
+}
+
+function choixQ3(val){
+
+reponsesQuestionnaire.q3 = val;
+
+// logique existante adaptée
+let choix = "randonnée";
+let autre = "accrobranche";
+
+if(reponsesQuestionnaire.q2 === "sensation"
+|| reponsesQuestionnaire.q3 === "haute"){
+
+choix = "accrobranche";
+autre = "randonnée";
+
+}
+
+document.getElementById("content").innerHTML = `
+
+<h2>📡 RÉSULTAT D'ANALYSE</h2>
+
+<p>Épreuve recommandée :</p>
+
+<h1>${choix.toUpperCase()}</h1>
+
+<button onclick="confirmerChoix()">CONFIRMER</button>
+<button onclick="changerChoix('${autre}')">
+CHOISIR ${autre.toUpperCase()}
+</button>
+
+`;
+
+}
+
+function validerQuestionnaire(){
+
+let q2 =
+document.getElementById("q2")
+.value.toLowerCase();
+
+let q3 =
+document.getElementById("q3")
+.value.toLowerCase();
+
+let choix = "randonnée";
+let autre = "accrobranche";
+
+if(q2.includes("sensation")
+|| q3.includes("haute")){
+
+    choix = "accrobranche";
+    autre = "randonnée";
+}
+
+document.getElementById("content").innerHTML = `
+
+<h2>📡 RÉSULTAT D'ANALYSE</h2>
+
+<p>
+Épreuve recommandée :
+</p>
+
+<h1>${choix.toUpperCase()}</h1>
+
+<p>
+Confirmer cette épreuve
+ou choisir l'alternative ?
+</p>
+
+<button onclick="confirmerChoix()">
+CONFIRMER ${choix.toUpperCase()}
+</button>
+
+<button onclick="changerChoix('${autre}')">
+CHOISIR ${autre.toUpperCase()}
+</button>
+
+`;
+
+}
+
+function changerChoix(nouveauChoix){
+
+points += 20;
+
+document.getElementById("message").innerText =
+`
+Décision alternative validée.
+
+Nouvelle épreuve :
+${nouveauChoix.toUpperCase()}
+`;
+
+afficherDuree();
+
+save();
+
+setTimeout(afficher,2000);
+
+}
+
+
+/*
+function confirmerChoix(){
+
+points += 25;
+
+document.getElementById("message").innerText =
+"Choix confirmé.";
+
+afficherDuree();
+
+// on stocke le choix pour l'étape suivante
+choixFinal = document.querySelector("h1").innerText.toLowerCase();
+
+save();
+
+// on passe directement à la question suivante
+setTimeout(afficher, 1000);
+
+}
+*/
+
+
+function confirmerChoix(){
+
+points += 25;
+
+document.getElementById("message").innerText =
+"Choix confirmé.";
+
+choixFinal = document.querySelector("h1").innerText.toLowerCase();
+
+save();
+
+afficherDuree(); // on enchaîne directement
+
+}
+
+
+function afficherDuree(){
+
+document.getElementById("message").innerText = "";
+
+document.getElementById("content").innerHTML = `
+
+<h2>⏱ DURÉE DU PARCOURS</h2>
+
+<p>
+Combien de temps a duré votre parcours ?
+</p>
+
+<input id="duree" type="number" placeholder="en heures">
+
+<br>
+
+<button onclick="validerDuree()">
+VALIDER
+</button>
+
+`;
+
+}
+
+function validerDuree(){
+
+let duree = parseFloat(document.getElementById("duree").value);
+
+let message = "";
+
+if(choixFinal.includes("accrobranche")){
+
+    if(duree > 1){
+        message = "Vous y êtes parvenu. Bravo pour votre persévérance.";
+        points += 20;
+    } else {
+        message = "Bravo ! Vous êtes un rapide !";
+        points += 15;
+    }
+
+}
+
+if(choixFinal.includes("randonnée")){
+
+    if(duree > 3){
+        message = "Bravo ! Vous avez su gérer endurance et patience ! Vérifier l'état de votre agent accompagnateur.";
+        points += 30;
+    } else {
+        message = "Bravo ! Vous avez su gérer endurance et motivation ! Comment avez-vous motivé les troupes ?";
+        points += 25;
+    }
+
+}
+
+progression++;
+save();
+
+document.getElementById("content").innerHTML = `
+
+<h2>📡 RÉSULTAT</h2>
+
+<p style="font-size:18px">
+${message}
+</p>
+
+<button onclick="afficher()">
+CONTINUER ▶
+</button>
+
+`;
+
+}
+//////////////////////////////////////////////////////
+// ☕ REPOS
+//////////////////////////////////////////////////////
+
+function afficherRepos(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>☕ JOURNÉE VALIDÉE</h2>
+
+<p>
+Vous avez bien mérité
+votre journée de repos demain.
+</p>
+
+<button onclick="continuer()">
+CONTINUER
+</button>
+
+`;
+
+}
+
+function continuer(){
+
+progression++;
+
+save();
+
+afficher();
+
+}
+
+//////////////////////////////////////////////////////
+// 🎭 SPECTACLE
+//////////////////////////////////////////////////////
+
+function afficherSpectacle(){
+
+let texte = `
+<h2>🎭 TEST DE SENSIBILITÉ</h2>
+`;
+
+if(indiceUtilise === "oui"){
+
+texte += `
+
+<p>
+Certaines vérités ne peuvent être découvertes
+qu'en observant les détails invisibles.
+</p>
+
+<p>
+⚠ Rattrapage du sens de l'observation activé.
+</p>
+
+<p>
+Choisissez votre formateur :
+</p>
+
+<input id="spectacleRep">
+
+<br>
+
+<button onclick="validerObservation()">
+VALIDER
+</button>
+
+`;
+
+}else{
+
+texte += `
+
+<p>
+Le prochain test porte
+sur votre sensibilité artistique.
+</p>
+
+<p>
+Quel type de spectacle mélange :
+chant, théâtre et mise en scène ?
+</p>
+
+<input id="spectacleRep">
+
+<br>
+
+<button onclick="validerSpectacle()">
+VALIDER
+</button>
+
+`;
+
+}
+
+document.getElementById("content").innerHTML =
+texte;
+
+}
+
+function validerObservation(){
+
+let rep =
+document.getElementById("spectacleRep")
+.value.toLowerCase();
+
+if(
+rep.includes("c")
+|| rep.includes("sherlock")
+){
+
+    points += 30;
+
+    document.getElementById("message").innerText =
+`
+Test de sensibilité validé.
+Observation renforcée.
+`;
+
+    progression++;
+
+    save();
+
+    setTimeout(afficher,2000);
+
+}else{
+
+    document.getElementById("message").innerText =
+    "Analyse incorrecte.";
+}
+
+}
+
+function validerSpectacle(){
+
+let rep =
+document.getElementById("spectacleRep")
+.value.toLowerCase();
+
+if(
+rep.includes("comédie musicale")
+|| rep.includes("comedie musicale")
+){
+
+    points += 30;
+
+    document.getElementById("message").innerText =
+`
+Test de sensibilité validé.
+`;
+
+    progression++;
+
+    save();
+
+    setTimeout(afficher,2000);
+
+}else{
+
+    document.getElementById("message").innerText =
+    "Réponse incorrecte.";
+}
+
+}
+
+//////////////////////////////////////////////////////
+// ✈ VOL
+//////////////////////////////////////////////////////
+
+function afficherVol(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>✈ DERNIÈRE ÉPREUVE</h2>
+
+<p>
+Depuis toujours,
+certains individus regardent le ciel
+non comme une limite…
+mais comme une destination.
+</p>
+
+<p>
+Je possède des ailes sans être un oiseau.
+Je traverse les nuages sans tomber.
+Qui suis-je ?
+</p>
+
+<input id="volRep">
+
+<br>
+
+<button onclick="validerVol()">
+VALIDER
+</button>
+
+`;
+
+}
+
+function validerVol(){
+
+let rep =
+document.getElementById("volRep")
+.value.toLowerCase();
+
+if(rep.includes("avion")){
+
+    points += 50;
+
+    progression++;
+
+    save();
+
+    afficher();
+
+}else{
+
+    document.getElementById("message").innerText =
+    "Réponse incorrecte.";
+
+}
+
+}
+
+//////////////////////////////////////////////////////
+// 🏆 FINAL
+//////////////////////////////////////////////////////
+
+function afficherFinal(){
+
+document.getElementById("content").innerHTML = `
+
+<h1>🏆 ÉVALUATION TERMINÉE</h1>
+
+<p>
+Vous avez montré vos compétences pour :
+</p>
+
+<ul>
+<li>Observation</li>
+<li>Timing</li>
+<li>Endurance physique</li>
+<li>Sensibilité</li>
+<li>Précision</li>
+</ul>
+
+<p>
+Certaines personnes regardent le ciel.
+D'autres sont capables d'y trouver leur place.
+</p>
+
+<p>
+Vous possédez désormais
+les qualités nécessaires
+pour devenir un agent hors du commun.
+</p>
+
+<h2>
+✈ TOTAL DES POINTS : ${points}
+</h2>
+
+<button onclick="mission()">
+ACCEPTER MA MISSION SPÉCIALE
+</button>
+
+`;
+
+}
+
+function mission(){
+
+window.location.href =
+"https://clubaeroformation.fr/vol-initiation.html";
+
+}
+
+//////////////////////////////////////////////////////
+// 🧪 OUTILS TEST
+//////////////////////////////////////////////////////
+
+function avanceTemps(h){
+
+    simulatedDate =
+    new Date(
+        simulatedDate.getTime()
+        + h * 60 * 60 * 1000
+    );
+
+    afficher();
+}
+
+function resetProgression(){
+
+    localStorage.clear();
+
+    progression = 0;
+    points = 0;
+
+    observationValidee = "non";
+
+    indiceUtilise = "non";
+
+    document.getElementById("message").innerText =
+    "Progression réinitialisée.";
+
+    document.getElementById("points").innerText =
+    points;
+
+    afficher();
+}
+
+//////////////////////////////////////////////////////
+// 🚀 LANCEMENT
+//////////////////////////////////////////////////////
+
+afficher();
+
+</script>
+
+</body>
+</html>
