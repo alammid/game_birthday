@@ -1352,7 +1352,7 @@ afficher();
 */
 
 //////////////////////////////////////////////////////
-// 📦 MARIO KART
+// 📦 MARIO KART (FLUX CORRIGÉ)
 //////////////////////////////////////////////////////
 
 function afficherColisMario(){
@@ -1368,8 +1368,7 @@ Un colis sécurisé vous a été attribué.
 </p>
 
 <p>
-Mission : le récupérer physiquement avant activation. 
-Ne pas ouvrir le colis avant de passer à la suite.
+Mission : le récupérer physiquement avant activation.
 </p>
 
 <button onclick="validerColis()">
@@ -1387,24 +1386,6 @@ document.getElementById("message").innerText =
 
 document.getElementById("content").innerHTML = `
 
-<h2>📦 COLIS DÉVERROUILLÉ</h2>
-
-<p>Extraction du contenu en cours...</p>
-
-<button onclick="afficherEnigmeCourse()">
-CONTINUER
-</button>
-
-`;
-
-}
-
-function afficherEnigmeCourse(){
-
-document.getElementById("message").innerText = "";
-
-document.getElementById("content").innerHTML = `
-
 <h2>🧩 DÉCODAGE DU COLIS</h2>
 
 <p>
@@ -1412,8 +1393,6 @@ Je peux être rapide ou longue,<br>
 je commence quand on part,<br>
 et je termine quand on franchit la ligne.
 </p>
-
-<p><b>Qui suis-je ?</b></p>
 
 <input id="repCourse">
 
@@ -1427,41 +1406,6 @@ VALIDER
 
 }
 
-function afficherOuvertureColisMario(){
-
-document.getElementById("message").innerText = "";
-
-document.getElementById("content").innerHTML = `
-
-<h2>📦 COLIS SÉCURISÉ</h2>
-
-<p>
-Le colis est maintenant entre vos mains.
-</p>
-
-<p>
-Système de sécurité activé.
-Veuillez procéder à l’ouverture officielle.
-</p>
-
-<button onclick="ouvrirColisMario()">
-OUVRIR LE COLIS
-</button>
-
-`;
-
-}
-
-function ouvrirColisMario(){
-
-document.getElementById("message").innerText =
-"🔓 Accès au contenu autorisé";
-
-afficherEnigmeCourse();
-
-}
-    
-
 function validerCourse(){
 
 let rep = document.getElementById("repCourse").value.toLowerCase();
@@ -1471,14 +1415,44 @@ if(rep.includes("course")){
 points += 30;
 
 document.getElementById("message").innerText =
-"✔ Simulation activée : Mario Kart Deluxe 8";
+"✔ Code correct : colis déverrouillé.";
 
 document.getElementById("content").innerHTML = `
 
-<h2>🎮 SIMULATION ACTIVÉE</h2>
+<h2>📦 ACCÈS AUTORISÉ</h2>
 
 <p>
-Module : MARIO KART DELUXE 8
+Le colis peut maintenant être ouvert.
+</p>
+
+<button onclick="ouvrirColisMario()">
+OUVRIR LE COLIS
+</button>
+
+`;
+
+save();
+
+}else{
+
+document.getElementById("message").innerText =
+"❌ Mauvaise analyse du colis.";
+
+}
+
+}
+
+function ouvrirColisMario(){
+
+document.getElementById("message").innerText =
+"🔓 Colis ouvert : module détecté";
+
+document.getElementById("content").innerHTML = `
+
+<h2>🎮 MODULE DÉTECTÉ</h2>
+
+<p>
+MARIO KART DELUXE 8
 </p>
 
 <p>
@@ -1499,15 +1473,6 @@ VALIDER POSITION
 
 `;
 
-save();
-
-}else{
-
-document.getElementById("message").innerText =
-"❌ Mauvaise analyse du colis.";
-
-}
-
 }
 
 function validerMario(){
@@ -1517,20 +1482,14 @@ let pos = parseInt(document.getElementById("posMario").value);
 let message = "";
 
 if(pos <= 3){
-
 message = "🏆 Agent d’élite - performance exceptionnelle";
 points += 40;
-
 }else if(pos <= 6){
-
 message = "🟡 Agent compétent - mission réussie";
 points += 25;
-
 }else{
-
 message = "🔴 Agent en formation - besoin d'entraînement";
 points += 10;
-
 }
 
 progression++;
