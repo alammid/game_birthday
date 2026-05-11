@@ -255,12 +255,17 @@ type:"enigme"
 },
 
 {
-date: new Date("2026-05-12T10:35:00"),
-type:"bowling"
+date: new Date("2026-05-12T17:00:00"),
+type:"preparation"
 },
 
 {
-date: new Date("2026-05-12T20:00:00"),
+date: new Date("2026-05-12T19:30:00"),
+type:"bowling"
+},
+    
+{
+date: new Date("2026-05-12T22:00:00"),
 type:"temps"
 },
 
@@ -394,6 +399,8 @@ function afficher(){
 
     if(etape.type === "enigme") afficherEnigme();
 
+    if(etape.type === "preparation") afficherPreparation();
+
     if(etape.type === "bowling") afficherBowling();
 
     if(etape.type === "temps") afficherTemps();
@@ -512,6 +519,57 @@ if(rep === "bowling"){
     "Accès refusé.";
 
 }
+
+}
+
+//////////////////////////////////////////////////////
+// 👖 TENUE TIME TRIPPER
+//////////////////////////////////////////////////////
+    
+function afficherPreparation(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>🧳 PRÉPARATION DE MISSION</h2>
+
+<p>
+Agent,
+</p>
+
+<p>
+Il est temps de préparer votre tenue
+pour l’épreuve de demain.
+</p>
+
+<p>
+Prévoyez :
+</p>
+
+<ul>
+<li>👟 Des baskets</li>
+<li>👖 Un pantalon confortable</li>
+<li>🩳 Jogging envisageable</li>
+</ul>
+
+<p>
+Le terrain exact n’a pas encore été validé.
+</p>
+
+<button onclick="continuerPreparation()">
+COMPRIS
+</button>
+
+`;
+
+}
+
+function continuerPreparation(){
+
+progression++;
+
+save();
+
+afficher();
 
 }
 
