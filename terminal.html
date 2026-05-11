@@ -418,6 +418,8 @@ function afficher(){
     if(etape.type === "temps") afficherTemps();
 
     if(etape.type === "enquete") afficherDossierEnquete();
+
+    if(etape.type === "repos") afficherRepos();
     
     /*
     if(etape.type === "questionnaire")
@@ -425,8 +427,6 @@ function afficher(){
     */
 
     if(etape.type === "questionnaire") demanderMeteoVendredi();
-
-    if(etape.type === "repos") afficherRepos();
     
     if(etape.type === "colis_mario") afficherColisMario();
 
