@@ -242,7 +242,6 @@ localStorage.getItem("observation") || "non";
 let indiceUtilise =
 localStorage.getItem("indiceUtilise") || "non";
 
-let METEO_VENDREDI = "unknown"; // "beau" ou "pluie"
 
 //////////////////////////////////////////////////////
 // 📅 ÉTAPES
@@ -400,9 +399,14 @@ function afficher(){
     if(etape.type === "temps") afficherTemps();
 
     if(etape.type === "enquete") afficherDossierEnquete();
-
+    
+    /*
     if(etape.type === "questionnaire")
     afficherQuestionnaire();
+    */
+
+    if(etape.type === "questionnaire")
+    demanderMeteoVendredi();
 
     /*
     if(etape.type === "repos")
@@ -1041,7 +1045,7 @@ afficherDuree();
 
 save();
 
-setTimeout(afficher,2000);
+// setTimeout(afficher,2000);
 
 }
 
