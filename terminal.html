@@ -265,7 +265,12 @@ type:"bowling"
 },
     
 {
-date: new Date("2026-05-12T22:00:00"),
+date: new Date("2026-05-12T20:00:00"),
+type:"briefing_temps"
+},
+
+{
+date: new Date("2026-05-13T15:40:00"),
 type:"temps"
 },
 
@@ -289,6 +294,11 @@ type:"repos"
 {
 date: new Date("2026-05-16T10:00:00"),
 type: "colis_mario"
+},
+
+{
+date: new Date("2026-05-16T10:05:00"),
+type:"colis_mario_ouverture"
 },
     
 {
@@ -403,6 +413,8 @@ function afficher(){
 
     if(etape.type === "bowling") afficherBowling();
 
+    if(etape.type === "briefing_temps") afficherBriefingTemps();
+
     if(etape.type === "temps") afficherTemps();
 
     if(etape.type === "enquete") afficherDossierEnquete();
@@ -412,25 +424,22 @@ function afficher(){
     afficherQuestionnaire();
     */
 
-    if(etape.type === "questionnaire")
-    demanderMeteoVendredi();
+    if(etape.type === "questionnaire") demanderMeteoVendredi();
 
     /*
     if(etape.type === "repos")
     afficherRepos();
     */
     
-    if(etape.type === "colis_mario") 
-    afficherColisMario();
+    if(etape.type === "colis_mario") afficherColisMario();
 
-    if(etape.type === "spectacle")
-    afficherSpectacle();
+    if(etape.type === "colis_mario_ouverture") afficherOuvertureColisMario();
 
-    if(etape.type === "vol")
-    afficherVol();
+    if(etape.type === "spectacle") afficherSpectacle();
 
-    if(etape.type === "final")
-    afficherFinal();
+    if(etape.type === "vol") afficherVol();
+
+    if(etape.type === "final") afficherFinal();
 }
 
 //////////////////////////////////////////////////////
@@ -724,6 +733,47 @@ if(mdp === "J'aime Midu !"){
 }
 
 //////////////////////////////////////////////////////
+// ⏳ BRIEFING TEMPS
+//////////////////////////////////////////////////////
+
+function afficherBriefingTemps(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>⏳ PROCHAIN TEST</h2>
+
+<p>
+Votre prochaine épreuve portera
+sur votre maîtrise du temps.
+</p>
+
+<p>
+📍 RDV à Hôpital Bicêtre à 13h20.
+</p>
+
+<p>
+Soyez à l'heure.
+</p>
+
+<button onclick="continuerBriefingTemps()">
+COMPRIS
+</button>
+
+`;
+
+}
+
+function continuerBriefingTemps(){
+
+progression++;
+
+save();
+
+afficher();
+
+}
+
+//////////////////////////////////////////////////////
 // ⏳ TEMPS
 //////////////////////////////////////////////////////
 
@@ -733,15 +783,6 @@ document.getElementById("content").innerHTML = `
 
 <h2>⏳ MAÎTRISE DU TEMPS</h2>
 
-<p>
-Prochain test :
-votre maîtrise du temps.
-</p>
-
-<p>
-RDV à Hôpital Bicêtre à 13h20.
-Soyez à l'heure !
-</p>
 
 <p>
 À quelle étape êtes-vous arrivé ? (1 à 7)
@@ -1234,7 +1275,7 @@ Une anomalie a été détectée dans le système de fermeture du Time Tripper...
 </p>
 
 <p>
-Reconstituez l’élément manquant :
+Reconstituez l’élément manquant en traversant la zone sécurisée :
 </p>
 
 <input id="anomalieRep">
@@ -1327,7 +1368,8 @@ Un colis sécurisé vous a été attribué.
 </p>
 
 <p>
-Mission : le récupérer physiquement avant activation.
+Mission : le récupérer physiquement avant activation. 
+Ne pas ouvrir le colis avant de passer à la suite.
 </p>
 
 <button onclick="validerColis()">
@@ -1384,6 +1426,41 @@ VALIDER
 `;
 
 }
+
+function afficherOuvertureColisMario(){
+
+document.getElementById("message").innerText = "";
+
+document.getElementById("content").innerHTML = `
+
+<h2>📦 COLIS SÉCURISÉ</h2>
+
+<p>
+Le colis est maintenant entre vos mains.
+</p>
+
+<p>
+Système de sécurité activé.
+Veuillez procéder à l’ouverture officielle.
+</p>
+
+<button onclick="ouvrirColisMario()">
+OUVRIR LE COLIS
+</button>
+
+`;
+
+}
+
+function ouvrirColisMario(){
+
+document.getElementById("message").innerText =
+"🔓 Accès au contenu autorisé";
+
+afficherEnigmeCourse();
+
+}
+    
 
 function validerCourse(){
 
