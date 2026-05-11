@@ -242,6 +242,8 @@ localStorage.getItem("observation") || "non";
 let indiceUtilise =
 localStorage.getItem("indiceUtilise") || "non";
 
+let METEO_VENDREDI = "unknown"; // "beau" ou "pluie"
+
 //////////////////////////////////////////////////////
 // 📅 ÉTAPES
 //////////////////////////////////////////////////////
@@ -264,15 +266,27 @@ type:"temps"
 },
 
 {
-date: new Date("2026-05-13T16:00:00"),
+date: new Date("2026-05-14T10:00:00"),
+type: "enquete"
+},
+
+{
+date: new Date("2026-05-14T16:00:00"),
 type:"questionnaire"
 },
 
+/*
 {
 date: new Date("2026-05-14T20:00:00"),
 type:"repos"
 },
+*/
 
+{
+date: new Date("2026-05-16T10:00:00"),
+type: "colis_mario"
+},
+    
 {
 date: new Date("2026-05-16T20:00:00"),
 type:"spectacle"
@@ -385,11 +399,18 @@ function afficher(){
 
     if(etape.type === "temps") afficherTemps();
 
+    if(etape.type === "enquete") afficherDossierEnquete();
+
     if(etape.type === "questionnaire")
     afficherQuestionnaire();
 
+    /*
     if(etape.type === "repos")
     afficherRepos();
+    */
+    
+    if(etape.type === "colis_mario") 
+    afficherColisMario();
 
     if(etape.type === "spectacle")
     afficherSpectacle();
@@ -710,6 +731,100 @@ setTimeout(() => {
 }
 
 //////////////////////////////////////////////////////
+//  DOSSIER D'ENQUETE
+//////////////////////////////////////////////////////
+function afficherDossierEnquete(){
+
+startEnqueteTime = Date.now();
+
+document.getElementById("content").innerHTML = `
+
+<h2>🧩 DOSSIER CLASSIFIÉ</h2>
+
+<p>
+Une anomalie a été détectée après le Time Tripper. Une porte du temps est restée ouverte.
+</p>
+
+<p>
+Décodez le message pour accéder au dossier et trouver comment refermer la porte.
+</p>
+
+<h3>🔐 ÉNIGME :</h3>
+
+<p style="font-size:18px">
+🧠 Je suis un mot que les agents doivent résoudre.<br>
+Je commence par un E, je contient une mission,<br>
+et je mène toujours à une investigation.
+</p>
+
+<input id="repEnquete" placeholder="Votre réponse">
+
+<br>
+
+<button onclick="validerDossierEnquete()">
+VALIDER
+</button>
+
+`;
+
+}
+
+let startEnqueteTime = 0;
+
+function validerDossierEnquete(){
+
+let rep = document.getElementById("repEnquete").value.toLowerCase();
+
+let endTime = Date.now();
+
+let temps = endTime - startEnqueteTime; // ms
+let minutes = temps / 60000;
+
+if(rep === "enquête" || rep === "enquete"){
+
+    let message = "";
+
+    if(minutes <= 120){
+
+        message = `
+🟢 DOSSIER DÉVERROUILLÉ
+
+Accès au fichier Stranger Things confirmé.
+
+⚠ Anomalie détectée dans la zone.
+`;
+
+        points += 40;
+
+    } else {
+
+        message = `
+🟠 DOSSIER PARTIEL
+
+Analyse trop lente.
+
+Fragments de l'anomalie récupérés partiellement.
+`;
+        points += 20;
+    }
+
+    progression++;
+    save();
+
+    document.getElementById("message").innerText = message;
+
+    setTimeout(afficher, 3000);
+
+}else{
+
+    document.getElementById("message").innerText =
+    "❌ Code incorrect.";
+
+}
+
+}
+
+//////////////////////////////////////////////////////
 // 🏕️ QUESTIONNAIRE
 //////////////////////////////////////////////////////
 let choixFinal = "";
@@ -746,6 +861,34 @@ ANALYSER
 
 }
 */
+
+function demanderMeteoVendredi(){
+
+document.getElementById("message").innerText = "";
+
+document.getElementById("content").innerHTML = `
+
+<h2>🌦 PRÉVISION MÉTÉO</h2>
+
+<p>Quelle est la météo prévue pour demain ?</p>
+
+<button onclick="choisirMeteo('beau')">☀ Beau temps</button>
+<button onclick="choisirMeteo('pluie')">🌧 Pluie</button>
+
+`;
+
+}
+
+function choisirMeteo(val){
+
+if(val === "beau"){
+afficherQuestionnaire();
+}else{
+afficherPluie();
+}
+
+}
+
 
 function afficherQuestionnaire(){
 
@@ -1013,6 +1156,64 @@ CONTINUER ▶
 `;
 
 }
+
+function afficherPluie(){
+
+document.getElementById("content").innerHTML = `
+
+<h2>⚠ CONDITIONS INSTABLES</h2>
+
+<p>
+Les conditions extérieures ne permettent pas la mission prévue.
+</p>
+
+<p>
+Une anomalie a été détectée dans le système de fermeture du Time Tripper...
+</p>
+
+<p>
+Reconstituez l’élément manquant :
+</p>
+
+<input id="anomalieRep">
+
+<br>
+
+<button onclick="validerAnomalie()">
+VALIDER
+</button>
+
+`;
+
+}
+
+function validerAnomalie(){
+
+let rep = document.getElementById("anomalieRep").value.toLowerCase();
+
+if(rep.includes("eau") && rep.includes("savon")){
+
+points += 30;
+
+document.getElementById("message").innerText =
+"✔ Anomalie refermée : système stabilisé";
+
+progression++;
+
+save();
+
+setTimeout(afficher,2000);
+
+}else{
+
+document.getElementById("message").innerText =
+"❌ Échec de reconstruction.";
+
+}
+
+}
+    
+/*    
 //////////////////////////////////////////////////////
 // ☕ REPOS
 //////////////////////////////////////////////////////
@@ -1043,6 +1244,170 @@ progression++;
 save();
 
 afficher();
+
+}
+*/
+
+//////////////////////////////////////////////////////
+// 📦 MARIO KART
+//////////////////////////////////////////////////////
+
+function afficherColisMario(){
+
+document.getElementById("message").innerText = "";
+
+document.getElementById("content").innerHTML = `
+
+<h2>📦 COLIS CLASSIFIÉ</h2>
+
+<p>
+Un colis sécurisé vous a été attribué.
+</p>
+
+<p>
+Mission : le récupérer physiquement avant activation.
+</p>
+
+<button onclick="validerColis()">
+J'AI RÉCUPÉRÉ LE COLIS
+</button>
+
+`;
+
+}
+
+function validerColis(){
+
+document.getElementById("message").innerText =
+"✔ Colis confirmé en possession.";
+
+document.getElementById("content").innerHTML = `
+
+<h2>📦 COLIS DÉVERROUILLÉ</h2>
+
+<p>Extraction du contenu en cours...</p>
+
+<button onclick="afficherEnigmeCourse()">
+CONTINUER
+</button>
+
+`;
+
+}
+
+function afficherEnigmeCourse(){
+
+document.getElementById("message").innerText = "";
+
+document.getElementById("content").innerHTML = `
+
+<h2>🧩 DÉCODAGE DU COLIS</h2>
+
+<p>
+Je peux être rapide ou longue,<br>
+je commence quand on part,<br>
+et je termine quand on franchit la ligne.
+</p>
+
+<p><b>Qui suis-je ?</b></p>
+
+<input id="repCourse">
+
+<br>
+
+<button onclick="validerCourse()">
+VALIDER
+</button>
+
+`;
+
+}
+
+function validerCourse(){
+
+let rep = document.getElementById("repCourse").value.toLowerCase();
+
+if(rep.includes("course")){
+
+points += 30;
+
+document.getElementById("message").innerText =
+"✔ Simulation activée : Mario Kart Deluxe 8";
+
+document.getElementById("content").innerHTML = `
+
+<h2>🎮 SIMULATION ACTIVÉE</h2>
+
+<p>
+Module : MARIO KART DELUXE 8
+</p>
+
+<p>
+Lance une partie et reviens avec ton résultat.
+</p>
+
+<p>
+Quelle est ta meilleure position ?
+</p>
+
+<input id="posMario" type="number">
+
+<br>
+
+<button onclick="validerMario()">
+VALIDER POSITION
+</button>
+
+`;
+
+save();
+
+}else{
+
+document.getElementById("message").innerText =
+"❌ Mauvaise analyse du colis.";
+
+}
+
+}
+
+function validerMario(){
+
+let pos = parseInt(document.getElementById("posMario").value);
+
+let message = "";
+
+if(pos <= 3){
+
+message = "🏆 Agent d’élite - performance exceptionnelle";
+points += 40;
+
+}else if(pos <= 6){
+
+message = "🟡 Agent compétent - mission réussie";
+points += 25;
+
+}else{
+
+message = "🔴 Agent en formation - besoin d'entraînement";
+points += 10;
+
+}
+
+progression++;
+save();
+
+document.getElementById("content").innerHTML = `
+
+<h2>🏁 RÉSULTAT DE SIMULATION</h2>
+
+<p>${message}</p>
+
+<button onclick="afficher()">
+CONTINUER
+</button>
+
+`;
 
 }
 
