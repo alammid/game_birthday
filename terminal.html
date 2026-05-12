@@ -296,10 +296,6 @@ date: new Date("2026-05-16T10:00:00"),
 type: "colis_mario"
 },
 
-{
-date: new Date("2026-05-16T10:05:00"),
-type:"colis_mario_ouverture"
-},
     
 {
 date: new Date("2026-05-16T20:00:00"),
@@ -429,7 +425,6 @@ function afficher(){
     if(etape.type === "repos") afficherRepos();
     if(etape.type === "questionnaire") demanderMeteoVendredi();
     if(etape.type === "colis_mario") afficherColisMario();
-    if(etape.type === "colis_mario_ouverture") afficherOuvertureColisMario();
     if(etape.type === "spectacle") afficherSpectacle();
     if(etape.type === "vol") afficherVol();
     if(etape.type === "final") afficherFinal();
@@ -1347,159 +1342,163 @@ afficher();
 // 📦 MARIO KART
 //////////////////////////////////////////////////////
 
+// 1️⃣ RÉCUPÉRATION DU COLIS
 function afficherColisMario(){
 
-document.getElementById("message").innerText = "";
+    document.getElementById("message").innerText = "";
 
-document.getElementById("content").innerHTML = `
+    document.getElementById("content").innerHTML = `
 
-<h2>📦 COLIS CLASSIFIÉ</h2>
+        <h2>📦 COLIS CLASSIFIÉ</h2>
 
-<p>
-Un colis sécurisé vous a été attribué.
-</p>
+        <p>
+        Un colis sécurisé vous a été attribué.
+        </p>
 
-<p>
-Mission : le récupérer physiquement avant activation.
-</p>
+        <p>
+        Mission : le récupérer physiquement avant activation.
+        </p>
 
-<button onclick="validerColis()">
-J'AI RÉCUPÉRÉ LE COLIS
-</button>
+        <button onclick="afficherEnigmeColis()">
+        J'AI RÉCUPÉRÉ LE COLIS
+        </button>
 
-`;
-
-}
-
-function validerColis(){
-
-document.getElementById("message").innerText =
-"✔ Colis confirmé en possession.";
-
-document.getElementById("content").innerHTML = `
-
-<h2>🧩 DÉCODAGE DU COLIS</h2>
-
-<p>
-Je peux être rapide ou longue,<br>
-je commence quand on part,<br>
-et je termine quand on franchit la ligne.
-</p>
-
-<input id="repCourse">
-
-<br>
-
-<button onclick="validerCourse()">
-VALIDER
-</button>
-
-`;
+    `;
 
 }
 
-function validerCourse(){
+// 2️⃣ AFFICHAGE DE L'ÉNIGME
+function afficherEnigmeColis(){
 
-let rep = document.getElementById("repCourse").value.toLowerCase();
+    document.getElementById("message").innerText =
+    "✔ Colis confirmé en possession.";
 
-if(rep.includes("course")){
+    document.getElementById("content").innerHTML = `
 
-points += 30;
+        <h2>🧩 DÉCODAGE DU COLIS</h2>
 
-document.getElementById("message").innerText =
-"✔ Code correct : colis déverrouillé.";
+        <p>
+        Je peux être rapide ou longue,<br>
+        je commence quand on part,<br>
+        et je termine quand on franchit la ligne.
+        </p>
 
-document.getElementById("content").innerHTML = `
+        <input id="repCourse">
 
-<h2>📦 ACCÈS AUTORISÉ</h2>
+        <br>
 
-<p>
-Le colis peut maintenant être ouvert.
-</p>
+        <button onclick="validerEnigmeColis()">
+        VALIDER
+        </button>
 
-<button onclick="ouvrirColisMario()">
-OUVRIR LE COLIS
-</button>
-
-`;
-
-save();
-
-}else{
-
-document.getElementById("message").innerText =
-"❌ Mauvaise analyse du colis.";
+    `;
 
 }
 
+// 3️⃣ VALIDATION → AUTORISATION D'OUVRIR
+function validerEnigmeColis(){
+
+    let rep = document.getElementById("repCourse")
+                       .value.toLowerCase();
+
+    if(rep.includes("course")){
+
+        points += 30;
+        save();
+
+        document.getElementById("message").innerText =
+        "🔓 Code correct : colis déverrouillé.";
+
+        document.getElementById("content").innerHTML = `
+
+            <h2>📦 ACCÈS AUTORISÉ</h2>
+
+            <p>
+            Le colis peut maintenant être ouvert.
+            </p>
+
+            <button onclick="ouvrirColisMario()">
+            OUVRIR LE COLIS
+            </button>
+
+        `;
+
+    }else{
+
+        document.getElementById("message").innerText =
+        "❌ Mauvaise analyse du colis.";
+
+    }
+
 }
 
+// 4️⃣ OUVERTURE + LANCEMENT DU JEU
 function ouvrirColisMario(){
 
-document.getElementById("message").innerText =
-"🔓 Colis ouvert : module détecté";
+    document.getElementById("message").innerText =
+    "🎮 Module détecté.";
 
-document.getElementById("content").innerHTML = `
+    document.getElementById("content").innerHTML = `
 
-<h2>🎮 MODULE DÉTECTÉ</h2>
+        <h2>🎮 MARIO KART DELUXE 8</h2>
 
-<p>
-MARIO KART DELUXE 8
-</p>
+        <p>
+        Lance une partie et reviens avec ton résultat.
+        </p>
 
-<p>
-Lance une partie et reviens avec ton résultat.
-</p>
+        <p>
+        Quelle est ta meilleure position ?
+        </p>
 
-<p>
-Quelle est ta meilleure position ?
-</p>
+        <input id="posMario" type="number">
 
-<input id="posMario" type="number">
+        <br>
 
-<br>
+        <button onclick="validerMario()">
+        VALIDER POSITION
+        </button>
 
-<button onclick="validerMario()">
-VALIDER POSITION
-</button>
-
-`;
+    `;
 
 }
 
+// 5️⃣ NOTATION DU CLASSEMENT
 function validerMario(){
 
-let pos = parseInt(document.getElementById("posMario").value);
+    let pos = parseInt(
+        document.getElementById("posMario").value
+    );
 
-let message = "";
+    let message = "";
 
-if(pos <= 3){
-message = "🏆 Agent d’élite - performance exceptionnelle";
-points += 40;
-}else if(pos <= 6){
-message = "🟡 Agent compétent - mission réussie";
-points += 25;
-}else{
-message = "🔴 Agent en formation - besoin d'entraînement";
-points += 10;
+    if(pos <= 3){
+        message = "🏆 Agent d'élite - performance exceptionnelle";
+        points += 40;
+    }else if(pos <= 6){
+        message = "🟡 Agent compétent - mission réussie";
+        points += 25;
+    }else{
+        message = "🔴 Agent en formation - besoin d'entraînement";
+        points += 10;
+    }
+
+    progression++;
+    save();
+
+    document.getElementById("content").innerHTML = `
+
+        <h2>🏁 RÉSULTAT DE SIMULATION</h2>
+
+        <p>${message}</p>
+
+        <button onclick="afficher()">
+        CONTINUER ▶
+        </button>
+
+    `;
+
 }
 
-progression++;
-save();
-
-document.getElementById("content").innerHTML = `
-
-<h2>🏁 RÉSULTAT DE SIMULATION</h2>
-
-<p>${message}</p>
-
-<button onclick="setTimeout(afficher, 100)">
-CONTINUER
-</button>
-
-`;
-
-}
 
 //////////////////////////////////////////////////////
 // 🎭 SPECTACLE
