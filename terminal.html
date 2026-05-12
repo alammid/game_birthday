@@ -401,55 +401,39 @@ function lockedScreen(date){
 
 function afficher(){
 
-    if(!etape){
-    document.getElementById("content").innerHTML = `
-        <h2>🏁 FIN OU ERREUR DE FLUX</h2>
-        <p>Progression hors limite : ${progression}</p>
-    `;
-    return;}
-
     document.getElementById("message").innerText = "";
 
     if (progression >= etapes.length) {
-    afficherFinal();
-    return;}
+        afficherFinal();
+        return;
+    }
 
-let etape = etapes[progression];
+    let etape = etapes[progression];
+
+    if(!etape){
+        document.getElementById("content").innerHTML = `
+            <h2>🏁 FIN OU ERREUR DE FLUX</h2>
+            <p>Progression hors limite : ${progression}</p>
+        `;
+        return;
+    }
 
     if(lockedScreen(etape.date)) return;
 
     if(etape.type === "enigme") afficherEnigme();
-
     if(etape.type === "preparation") afficherPreparation();
-
     if(etape.type === "bowling") afficherBowling();
-
     if(etape.type === "briefing_temps") afficherBriefingTemps();
-
     if(etape.type === "temps") afficherTemps();
-
     if(etape.type === "enquete") afficherDossierEnquete();
-
     if(etape.type === "repos") afficherRepos();
-    
-    /*
-    if(etape.type === "questionnaire")
-    afficherQuestionnaire();
-    */
-
     if(etape.type === "questionnaire") demanderMeteoVendredi();
-    
     if(etape.type === "colis_mario") afficherColisMario();
-
     if(etape.type === "colis_mario_ouverture") afficherOuvertureColisMario();
-
     if(etape.type === "spectacle") afficherSpectacle();
-
     if(etape.type === "vol") afficherVol();
-
     if(etape.type === "final") afficherFinal();
 }
-
 //////////////////////////////////////////////////////
 // 🧠 ÉNIGME OBSERVATION
 //////////////////////////////////////////////////////
