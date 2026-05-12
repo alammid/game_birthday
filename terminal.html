@@ -401,9 +401,20 @@ function lockedScreen(date){
 
 function afficher(){
 
+    if(!etape){
+    document.getElementById("content").innerHTML = `
+        <h2>🏁 FIN OU ERREUR DE FLUX</h2>
+        <p>Progression hors limite : ${progression}</p>
+    `;
+    return;}
+
     document.getElementById("message").innerText = "";
 
-    let etape = etapes[progression];
+    if (progression >= etapes.length) {
+    afficherFinal();
+    return;}
+
+let etape = etapes[progression];
 
     if(lockedScreen(etape.date)) return;
 
