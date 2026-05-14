@@ -282,26 +282,21 @@ date: new Date("2026-05-14T10:00:00"),
 type: "enquete"
 },
 
-// ── NOUVEAU : page de choix après l'enquête ──────────
+// ── Page de choix après l'enquête ────────────────────
 {
 date: new Date("2026-05-14T16:00:00"),
 type: "choix_enquete"
 },
 
+// ── Mario Kart vendredi 15 à 16h ─────────────────────
 {
-date: new Date("2026-05-14T20:00:00"),
-type:"repos"
-},
-
-// ── Mario Kart déplacé au vendredi 15 ────────────────
-{
-date: new Date("2026-05-15T10:00:00"),
+date: new Date("2026-05-15T16:00:00"),
 type: "colis_mario"
 },
 
-// ── Durée / défi pluie le samedi 16 ──────────────────
+// ── Rando / accrobranche / eau savonneuse samedi 16h ─
 {
-date: new Date("2026-05-16T10:00:00"),
+date: new Date("2026-05-16T16:00:00"),
 type: "activite_duree"
 },
 
@@ -431,7 +426,6 @@ function afficher(){
     if(etape.type === "temps")           afficherTemps();
     if(etape.type === "enquete")         afficherDossierEnquete();
     if(etape.type === "choix_enquete")   afficherChoixEnquete();   // ← NOUVEAU
-    if(etape.type === "repos")           afficherRepos();
     if(etape.type === "colis_mario")     afficherColisMario();
     if(etape.type === "activite_duree")  afficherActiviteDuree();  // ← NOUVEAU
     if(etape.type === "spectacle")       afficherSpectacle();
@@ -931,14 +925,31 @@ Fragments de l'anomalie récupérés partiellement.
 
 function afficherChoixEnquete(){
 
+document.getElementById("message").innerText = "";
+
+let activiteStockee = localStorage.getItem("choixActivite");
+let meteoStockee    = localStorage.getItem("meteo");
+
+let infoChoix = "";
+if(activiteStockee){
+    infoChoix = `
+    <p style="border:1px solid #00ff88; display:inline-block; padding:8px 18px; margin-bottom:10px;">
+    ✅ Activité sélectionnée : <strong>${activiteStockee.toUpperCase()}</strong>
+    </p>`;
+} else if(meteoStockee === "pluie"){
+    infoChoix = `
+    <p style="border:1px solid #00ff88; display:inline-block; padding:8px 18px; margin-bottom:10px;">
+    🌧 Météo enregistrée — épreuve pluie activée
+    </p>`;
+}
+
 document.getElementById("content").innerHTML = `
 
 <h2>📋 PROCHAINES DIRECTIVES</h2>
 
-<p>
-Deux options s'offrent à vous, agent.
-Choisissez votre prochaine action :
-</p>
+${infoChoix}
+
+<p>Choisissez votre prochaine action :</p>
 
 <br>
 
@@ -947,7 +958,7 @@ Choisissez votre prochaine action :
 </button>
 
 <p style="font-size:13px; opacity:0.7;">
-Déterminer l'activité selon les conditions météo
+Déterminer (ou changer) l'activité selon la météo
 </p>
 
 <br>
@@ -957,7 +968,7 @@ Déterminer l'activité selon les conditions météo
 </button>
 
 <p style="font-size:13px; opacity:0.7;">
-Renseigner le temps mis pour résoudre l'enquête
+Valider et renseigner le temps mis pour résoudre l'enquête
 </p>
 
 `;
@@ -1050,32 +1061,19 @@ function choisirMeteo(val){
 localStorage.setItem("meteo", val);
 
 if(val === "beau"){
+    // Effacer un éventuel ancien choix pluie
+    localStorage.removeItem("choixActivite");
+    choixFinal = "";
     afficherQuestionnaire();
 }else{
-    // Pluie : informer l'agent, avancer la progression
-    // Le défi "eau + savon" sera disponible samedi
-    progression++;
-    save();
+    // Pluie : effacer activité beau temps si existante, retour page choix
+    localStorage.removeItem("choixActivite");
+    choixFinal = "";
 
-    document.getElementById("content").innerHTML = `
+    document.getElementById("message").innerText =
+    "🌧 Météo enregistrée.";
 
-    <h2>🌧 CONDITIONS INSTABLES</h2>
-
-    <p>
-    Les conditions extérieures ne permettent pas la mission prévue.
-    </p>
-
-    <p>
-    L'épreuve adaptée sera débloquée demain matin.
-    </p>
-
-    <p style="opacity:0.7; font-size:13px">
-    Restez en alerte, agent.
-    </p>
-
-    `;
-
-    setTimeout(afficher, 3000);
+    setTimeout(afficherChoixEnquete, 1500);
 }
 
 }
@@ -1170,40 +1168,41 @@ CHOISIR ${autre.toUpperCase()}
 
 function confirmerChoix(){
 
-points += 25;
+// Points uniquement au premier choix (pas de cumul si on refait le questionnaire)
+if(!localStorage.getItem("choixActivite")){
+    points += 25;
+    save();
+}
 
-// Récupérer le choix affiché et le stocker
 choixFinal = document.querySelector("h1").innerText.toLowerCase();
 localStorage.setItem("choixActivite", choixFinal);
+localStorage.setItem("meteo", "beau");
 
-progression++;
-save();
+document.getElementById("message").innerText =
+`✅ Activité confirmée : ${choixFinal.toUpperCase()}`;
 
-document.getElementById("message").innerText = "Choix confirmé.";
-
-// La durée sera demandée samedi (activite_duree)
-setTimeout(afficher, 1500);
+// Retour à la page de choix — le joueur peut refaire le questionnaire
+setTimeout(afficherChoixEnquete, 1500);
 
 }
 
 function changerChoix(nouveauChoix){
 
-points += 20;
+// Points uniquement au premier changement
+if(!localStorage.getItem("choixActivite")){
+    points += 20;
+    save();
+}
 
 choixFinal = nouveauChoix;
 localStorage.setItem("choixActivite", choixFinal);
+localStorage.setItem("meteo", "beau");
 
-progression++;
-save();
+document.getElementById("message").innerText =
+`✅ Activité choisie : ${nouveauChoix.toUpperCase()}`;
 
-document.getElementById("message").innerText = `
-Décision alternative validée.
-
-Nouvelle épreuve : ${nouveauChoix.toUpperCase()}
-`;
-
-// La durée sera demandée samedi (activite_duree)
-setTimeout(afficher, 1500);
+// Retour à la page de choix — le joueur peut refaire le questionnaire
+setTimeout(afficherChoixEnquete, 1500);
 
 }
 
@@ -1390,40 +1389,6 @@ document.getElementById("message").innerText =
 }
     
     
-//////////////////////////////////////////////////////
-// ☕ REPOS
-//////////////////////////////////////////////////////
-
-function afficherRepos(){
-
-document.getElementById("content").innerHTML = `
-
-<h2>☕ JOURNÉE VALIDÉE</h2>
-
-<p>
-Vous avez bien mérité
-votre journée de repos demain.
-</p>
-
-<button onclick="continuer()">
-CONTINUER
-</button>
-
-`;
-
-}
-
-function continuer(){
-
-progression++;
-
-save();
-
-afficher();
-
-}
-
-
 //////////////////////////////////////////////////////
 // 📦 MARIO KART
 //////////////////////////////////////////////////////
