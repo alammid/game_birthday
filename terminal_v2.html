@@ -198,6 +198,25 @@ RESET
 
 </div>
 
+<!-- Bouton reset visible par le candidat -->
+<div id="resetCandidatPanel" style="
+    position:fixed;
+    bottom:10px;
+    right:10px;
+    z-index:9999;
+">
+<button onclick="resetCandidat()" style="
+    background:black;
+    color:#ff4444;
+    border:1px solid #ff4444;
+    font-size:11px;
+    padding:5px 10px;
+    opacity:0.6;
+" title="Réinitialiser ma progression">
+🔄 RESET
+</button>
+</div>
+
 <script>
 
 //////////////////////////////////////////////////////
@@ -262,19 +281,22 @@ date: new Date("2026-05-12T17:00:00"),
 type:"preparation"
 },
 
-{
-date: new Date("2026-05-12T19:30:00"),
-type:"bowling"
-},
-    
+// ── Briefing Time Tripper le soir du 12 ──────────────
 {
 date: new Date("2026-05-12T20:00:00"),
 type:"briefing_temps"
 },
 
+// ── Score Time Tripper le 13 ─────────────────────────
 {
 date: new Date("2026-05-13T15:40:00"),
 type:"temps"
+},
+
+// ── Score bowling après le Time Tripper ──────────────
+{
+date: new Date("2026-05-13T19:00:00"),
+type:"bowling"
 },
 
 {
@@ -282,10 +304,16 @@ date: new Date("2026-05-14T10:00:00"),
 type: "enquete"
 },
 
-// ── Page de choix après l'enquête ────────────────────
+// ── Page de choix dès 13h le 14 ──────────────────────
 {
 date: new Date("2026-05-14T13:00:00"),
 type: "choix_enquete"
+},
+
+// ── Suite de l'aventure (durée enquête) à 16h ────────
+{
+date: new Date("2026-05-14T16:00:00"),
+type: "suite_enquete"
 },
 
 // ── Mario Kart vendredi 15 à 16h ─────────────────────
@@ -425,9 +453,10 @@ function afficher(){
     if(etape.type === "briefing_temps")  afficherBriefingTemps();
     if(etape.type === "temps")           afficherTemps();
     if(etape.type === "enquete")         afficherDossierEnquete();
-    if(etape.type === "choix_enquete")   afficherChoixEnquete();   // ← NOUVEAU
+    if(etape.type === "choix_enquete")   afficherChoixEnquete();
+    if(etape.type === "suite_enquete")   afficherSuiteEnquete();
     if(etape.type === "colis_mario")     afficherColisMario();
-    if(etape.type === "activite_duree")  afficherActiviteDuree();  // ← NOUVEAU
+    if(etape.type === "activite_duree")  afficherActiviteDuree();
     if(etape.type === "spectacle")       afficherSpectacle();
     if(etape.type === "vol")             afficherVol();
     if(etape.type === "final")           afficherFinal();
@@ -920,7 +949,7 @@ Fragments de l'anomalie récupérés partiellement.
 }
 
 //////////////////////////////////////////////////////
-// 📋 PAGE DE CHOIX APRÈS L'ENQUÊTE  ← NOUVEAU
+// 📋 PAGE DE CHOIX APRÈS L'ENQUÊTE
 //////////////////////////////////////////////////////
 
 function afficherChoixEnquete(){
@@ -963,15 +992,24 @@ Déterminer (ou changer) l'activité selon la météo
 
 <br>
 
-<button onclick="afficherSuiteEnquete()" style="font-size:18px; padding:15px 25px;">
-🔍 SUITE DE L'AVENTURE
+<button onclick="continuerAventure()" style="font-size:18px; padding:15px 25px;">
+▶ CONTINUER L'AVENTURE
 </button>
 
 <p style="font-size:13px; opacity:0.7;">
-Valider et renseigner le temps mis pour résoudre l'enquête
+La suite sera disponible à 16h00
 </p>
 
 `;
+
+}
+
+// Avance vers suite_enquete (verrouillé jusqu'à 16h)
+function continuerAventure(){
+
+progression++;
+save();
+afficher();
 
 }
 
@@ -1828,6 +1866,26 @@ function resetProgression(){
 
     document.getElementById("points").innerText =
     points;
+
+    afficher();
+}
+
+function resetCandidat(){
+
+    if(!confirm("⚠ Réinitialiser toute ta progression ?\n\nCette action est irréversible.")){
+        return;
+    }
+
+    localStorage.clear();
+
+    progression = 0;
+    points = 0;
+    choixFinal = "";
+    observationValidee = "non";
+    indiceUtilise = "non";
+
+    document.getElementById("points").innerText = points;
+    document.getElementById("message").innerText = "";
 
     afficher();
 }
